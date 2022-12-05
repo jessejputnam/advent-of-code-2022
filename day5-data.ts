@@ -1,4 +1,6 @@
-const data = `move 3 from 2 to 1
+/* ############################### Instructions ################################# */
+
+const data_instructions = `move 3 from 2 to 1
 move 8 from 6 to 4
 move 4 from 8 to 2
 move 3 from 1 to 9
@@ -508,27 +510,55 @@ interface instruc {
   to_stack: number;
 }
 
-const instructions: instruc[] = data.split("\n").map((instruction) => {
-  const split_instruction = instruction.split(" ");
-  return {
-    num_crates: Number(split_instruction[1]),
-    from_stack: Number(split_instruction[3]) - 1,
-    to_stack: Number(split_instruction[5]) - 1
-  };
-});
+const instructions: instruc[] = data_instructions
+  .split("\n")
+  .map((instruction) => {
+    const split_instruction = instruction.split(" ");
+    return {
+      num_crates: Number(split_instruction[1]),
+      from_stack: Number(split_instruction[3]) - 1,
+      to_stack: Number(split_instruction[5]) - 1
+    };
+  });
 
-const ship_raw = [
-  "MJCBFRLH",
-  "ZCD",
-  "HJFCNGW",
-  "PJDMTSB",
-  "NCDRJ",
-  "WLDQPJGZ",
-  "PZTFRH",
-  "LVMG",
-  "CBGPFQRJ"
-];
+/* ############################### SHIP ################################# */
 
-const ship_init = ship_raw.map((stack) => stack.split(""));
+const data_ship = `[H]                 [Z]         [J]
+[L]     [W] [B]     [G]         [R]
+[R]     [G] [S]     [J] [H]     [Q]
+[F]     [N] [T] [J] [P] [R]     [F]
+[B]     [C] [M] [R] [Q] [F] [G] [P]
+[C] [D] [F] [D] [D] [D] [T] [M] [G]
+[J] [C] [J] [J] [C] [L] [Z] [V] [B]
+[M] [Z] [H] [P] [N] [W] [P] [L] [C]`;
+
+function getRows(data: string): string[][] {
+  return data.split("\n").map((row) => row.split(""));
+}
+
+function getRowValues(row: string[]): string[] {
+  return row
+    .filter((_, i) => (i - 1) % 4 === 0 && i !== 0)
+    .map((v) => v.trim());
+}
+
+function buildStacks(ship: string[], rows: string[][]): void {
+  rows.forEach((row: string[]) =>
+    row.forEach((crate: string, i: number) => (ship[i] = crate + ship[i]))
+  );
+}
+
+function parseShip(data: string) {
+  const ship_rows: string[][] = getRows(data).map((row: string[]) =>
+    getRowValues(row)
+  );
+
+  const ship: string[] = new Array(9).fill("");
+  buildStacks(ship, ship_rows);
+
+  return ship.map((stack) => stack.split(""));
+}
+
+const ship_init = parseShip(data_ship);
 
 export { instructions, ship_init };
