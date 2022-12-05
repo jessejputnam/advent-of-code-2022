@@ -554,6 +554,7 @@ function parseShip(data: string) {
   );
 
   const ship: string[] = new Array(9).fill("");
+
   buildStacks(ship, ship_rows);
 
   return ship.map((stack) => stack.split(""));
