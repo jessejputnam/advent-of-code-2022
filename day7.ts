@@ -1,7 +1,6 @@
 import { input, test_data } from "./day7-data";
 
 interface File {
-  file: boolean;
   size: number;
   name: string;
 }
@@ -40,8 +39,8 @@ function addItem(history: string[], dir: Dir, item: string | File): void {
     if (typeof item === "string") {
       if (!(item in dir)) dir[item] = {};
     } else {
-      if (!("file" in dir)) dir["file"] = [];
-      (dir["file"] as Array<File>).push(item);
+      if (!("files" in dir)) dir["files"] = [];
+      (dir["files"] as Array<File>).push(item);
     }
     return;
   } else {
@@ -69,7 +68,6 @@ function buildFileSystem(input: string[][]): Dir {
     else if (type === "dir") addItem(history, root, line[0]);
     else {
       const file: File = {
-        file: true,
         size: Number(type),
         name: line[0]
       };
@@ -81,6 +79,31 @@ function buildFileSystem(input: string[][]): Dir {
 }
 
 const root = buildFileSystem(test_data);
-console.log(root);
+// console.log(root);
 
-function getTargetedDirSize(root: Dir) {}
+function getTargetedDirSize(root: Dir | File[], sum: number = 0) {
+  // console.log("-------- START ----------", Object.keys(root));
+  if (Array.isArray(root)) return;
+  // console.log("===== RECURSE ======");
+
+  for (let dir in root) {
+    getTargetedDirSize(root[dir], sum);
+
+    const files: File[] = root.files as File[];
+    if (Array.isArray(root[dir])) {
+      files.forEach((file) => (sum += file.size));
+      console.log(files);
+    }
+  }
+
+  // console.log(sum, Object.keys(root));
+  // console.log("######### END ############");
+  console.log(sum);
+}
+
+getTargetedDirSize(root);
+
+// files.forEach((file) => {
+//   sum += file.size;
+//   // console.log(file.size, file.name);
+// });
