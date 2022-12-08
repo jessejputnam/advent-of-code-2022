@@ -78,32 +78,32 @@ function buildFileSystem(input: string[][]): Dir {
   return root;
 }
 
-const root = buildFileSystem(test_data);
-// console.log(root);
+const root = buildFileSystem(input);
 
-function getTargetedDirSize(root: Dir | File[], sum: number = 0) {
-  // console.log("-------- START ----------", Object.keys(root));
-  if (Array.isArray(root)) return;
-  // console.log("===== RECURSE ======");
+function findFilesRecur(
+  root: Dir | File[],
+  sizeLimit: number,
+  stored: number,
+  sum: number[] = [0]
+) {
+  if (Array.isArray(root)) {
+    let size: number = stored;
+    root.forEach((file) => (size += file.size));
 
-  for (let dir in root) {
-    getTargetedDirSize(root[dir], sum);
-
-    const files: File[] = root.files as File[];
-    if (Array.isArray(root[dir])) {
-      files.forEach((file) => (sum += file.size));
-      console.log(files);
-    }
+    console.log("Array Size:", size);
+    return size <= sizeLimit ? size : 0;
   }
 
-  // console.log(sum, Object.keys(root));
-  // console.log("######### END ############");
-  console.log(sum);
+  for (let dir in root) {
+    const size = stored;
+    const dirSize = findFilesRecur(root[dir], sizeLimit, size, sum);
+    console.log("DIRSIZE ADD", dirSize, sum);
+    if (dirSize + sum[0] <= sizeLimit) sum[0] += dirSize;
+  }
+
+  console.log("END:", sum);
+  return sum[0];
 }
 
-getTargetedDirSize(root);
-
-// files.forEach((file) => {
-//   sum += file.size;
-//   // console.log(file.size, file.name);
-// });
+const sum = findFilesRecur(root, 100000, 0);
+console.log(sum);
