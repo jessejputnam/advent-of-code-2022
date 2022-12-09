@@ -24,7 +24,7 @@ interface Bridge {
 }
 
 /* ############################################################## */
-/* ###################### HELPER FUNCS ########################## */
+/* ###################### HELPER FUNC ########################## */
 /* ############################################################## */
 
 function isTouching(head_coords: number[], tail_coords: number[]): boolean {
@@ -95,22 +95,10 @@ function BridgeFactory(): Bridge {
 
         for (let j = 0; j < num_cols; j++) {
           // Adds column to the left or row above
-          if (dir === "L") {
-            // Add new grid item
-            if (j === 0) newGrid[i][j] = GridItem();
-            // Shift old grid item horizontally
-            else {
-              newGrid[i][j] = GridItem(grid[i][j - 1].visited);
-            }
-          } else if (dir === "U") {
-            // Add new grid item
-            if (i === 0) newGrid[i][j] = GridItem();
-            // Shift old grid items vertically
-            else {
-              if (!newGrid[i]) newGrid[i] = [];
-              newGrid[i][j] = GridItem(grid[i - 1][j].visited);
-            }
-          }
+          if (dir === "L")
+            newGrid[i][j] = !j ? GridItem() : GridItem(grid[i][j - 1].visited);
+          else if (dir === "U")
+            newGrid[i][j] = !i ? GridItem() : GridItem(grid[i - 1][j].visited);
         }
       }
       this.grid = newGrid;
@@ -201,12 +189,22 @@ function GridItem(visited: boolean = false): GridItem {
 /* ###################### MAIN FUNC ########################## */
 /* ############################################################## */
 
-// PART 1
+function getTails(num: number): Knot[] {
+  const knots: Knot[] = [];
+  for (let i = 0; i < num; i++) {
+    if (i === num - 1) knots.push(KnotFactory(true));
+    else knots.push(KnotFactory());
+  }
+  return knots;
+}
 
 function findVisited(input: Cmd[]) {
   const bridge: Bridge = BridgeFactory();
+
   const head: Knot = KnotFactory();
-  const tail: Knot = KnotFactory(true);
+
+  const tails: Knot[] = getTails(1);
+  // const tails: Knot[] = getTails(9);
 
   for (let cmd of input) {
     let count = cmd.steps;
@@ -214,8 +212,14 @@ function findVisited(input: Cmd[]) {
 
     while (count > 0) {
       const coordsUpdated = head.moveHead(dir, bridge);
-      if (coordsUpdated) tail.updateCoords(dir);
-      tail.moveTail(head.coords, bridge);
+      if (coordsUpdated) tails.forEach((knot) => knot.updateCoords(dir));
+
+      let prevKnot = head;
+      for (let i = 0; i < tails.length; i++) {
+        tails[i].moveTail(prevKnot.coords, bridge);
+        prevKnot = tails[i];
+      }
+
       count--;
     }
   }
@@ -230,54 +234,6 @@ function findVisited(input: Cmd[]) {
 
   return visited;
 }
-
-// PART 2
-
-// function findVisited(input: Cmd[]) {
-//   const bridge: Bridge = BridgeFactory();
-
-//   const head: Knot = KnotFactory();
-
-//   const one: Knot = KnotFactory();
-//   const two: Knot = KnotFactory();
-//   const three: Knot = KnotFactory();
-//   const four: Knot = KnotFactory();
-//   const five: Knot = KnotFactory();
-//   const six: Knot = KnotFactory();
-//   const seven: Knot = KnotFactory();
-//   const eight: Knot = KnotFactory();
-//   const tail: Knot = KnotFactory(true);
-
-//   const tails: Knot[] = [one, two, three, four, five, six, seven, eight, tail];
-
-//   for (let cmd of input) {
-//     let count = cmd.steps;
-//     const dir = cmd.dir;
-
-//     while (count > 0) {
-//       const coordsUpdated = head.moveHead(dir, bridge);
-//       if (coordsUpdated) tails.forEach((knot) => knot.updateCoords(dir));
-
-//       let prevKnot = head;
-//       for (let i = 0; i < tails.length; i++) {
-//         tails[i].moveTail(prevKnot.coords, bridge);
-//         prevKnot = tails[i];
-//       }
-
-//       count--;
-//     }
-//   }
-
-//   let visited = 0;
-
-//   for (let i = 0; i < bridge.grid.length; i++) {
-//     for (let j = 0; j < bridge.grid[0].length; j++) {
-//       if (bridge.grid[i][j].visited) visited++;
-//     }
-//   }
-
-//   return visited;
-// }
 
 const result = findVisited(input);
 
