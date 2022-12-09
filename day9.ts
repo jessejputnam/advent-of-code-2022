@@ -52,23 +52,24 @@ function BridgeFactory(): Bridge {
     grid: [[GridItem(true)]],
 
     expandGrid: function (dir): void {
-      // ########## Expand Grid - No Shifting
+      // ########## Expand Grid ############# - No Shifting
 
       if (dir === "D") {
         // Use length to get last index of grid after addition
         const idx: number = this.grid.length;
         const row_len: number = this.grid[0].length;
 
+        // Add new row && fill with grid items
         this.grid.push([]);
         for (let i = 0; i < row_len; i++) {
           this.grid[idx][i] = GridItem();
         }
-
         return;
       }
 
       if (dir === "R") {
-        const newGrid = this.grid.map((row) => {
+        // Append new grid item to end of each row
+        const newGrid: GridItem[][] = this.grid.map((row) => {
           row.push(GridItem());
           return row;
         });
@@ -76,16 +77,20 @@ function BridgeFactory(): Bridge {
         return;
       }
 
-      // ########### Expand Grid - With Shifting
-      const grid = this.grid;
+      // ########### Expand Grid ########### - With Shifting
+
+      const grid: GridItem[][] = this.grid;
       const newGrid: GridItem[][] = [[]];
 
-      const num_rows =
+      // Get row and col numbers for expansion dependent on direction
+      const num_rows: number =
         dir === "U" || dir === "D" ? grid.length + 1 : grid.length;
-      const num_cols =
+      const num_cols: number =
         dir === "U" || dir === "D" ? grid[0].length : grid[0].length + 1;
 
+      // Shift grids
       for (let i = 0; i < num_rows; i++) {
+        // If no row, make one
         if (!newGrid[i]) newGrid[i] = [];
 
         for (let j = 0; j < num_cols; j++) {
@@ -124,6 +129,8 @@ function KnotFactory(isTail: boolean = false): Knot {
 
     updateCoords: function (dir): boolean {
       const [row, col]: number[] = this.coords;
+
+      // Return whether coordinates were updated to trigger tail updates
       let isUpdated = dir === "U" || dir === "L";
 
       if (dir === "U") this.coords[0] = row + 1;
@@ -133,9 +140,9 @@ function KnotFactory(isTail: boolean = false): Knot {
     },
 
     moveHead: function (dir, bridge): boolean {
-      // Expand Grid if necessary
-      let updatedCoords = false;
+      let updatedCoords: boolean = false;
 
+      // Expand Grid if necessary conditions met
       if (
         (dir === "U" && !this.coords[0]) ||
         (dir === "L" && !this.coords[1]) ||
@@ -196,52 +203,10 @@ function GridItem(visited: boolean = false): GridItem {
 
 // PART 1
 
-// function findVisited(input: Cmd[]) {
-//   const bridge: Bridge = BridgeFactory();
-//   const head: Knot = KnotFactory();
-//   const tail: Knot = KnotFactory();
-
-//   for (let cmd of input) {
-//     let count = cmd.steps;
-//     const dir = cmd.dir;
-
-//     while (count > 0) {
-//       const coordsUpdated = head.moveHead(dir, bridge);
-//       if (coordsUpdated) tail.updateCoords(dir);
-//       tail.moveTail(head.coords, bridge);
-//       count--;
-//     }
-//   }
-
-//   let visited = 0;
-
-//   for (let i = 0; i < bridge.grid.length; i++) {
-//     for (let j = 0; j < bridge.grid[0].length; j++) {
-//       if (bridge.grid[i][j].visited) visited++;
-//     }
-//   }
-
-//   return visited;
-// }
-
-// PART 2
-
 function findVisited(input: Cmd[]) {
   const bridge: Bridge = BridgeFactory();
-
   const head: Knot = KnotFactory();
-
-  const one: Knot = KnotFactory();
-  const two: Knot = KnotFactory();
-  const three: Knot = KnotFactory();
-  const four: Knot = KnotFactory();
-  const five: Knot = KnotFactory();
-  const six: Knot = KnotFactory();
-  const seven: Knot = KnotFactory();
-  const eight: Knot = KnotFactory();
   const tail: Knot = KnotFactory(true);
-
-  const tails: Knot[] = [one, two, three, four, five, six, seven, eight, tail];
 
   for (let cmd of input) {
     let count = cmd.steps;
@@ -249,14 +214,8 @@ function findVisited(input: Cmd[]) {
 
     while (count > 0) {
       const coordsUpdated = head.moveHead(dir, bridge);
-      if (coordsUpdated) tails.forEach((knot) => knot.updateCoords(dir));
-
-      let prevKnot = head;
-      for (let i = 0; i < tails.length; i++) {
-        tails[i].moveTail(prevKnot.coords, bridge);
-        prevKnot = tails[i];
-      }
-
+      if (coordsUpdated) tail.updateCoords(dir);
+      tail.moveTail(head.coords, bridge);
       count--;
     }
   }
@@ -271,6 +230,54 @@ function findVisited(input: Cmd[]) {
 
   return visited;
 }
+
+// PART 2
+
+// function findVisited(input: Cmd[]) {
+//   const bridge: Bridge = BridgeFactory();
+
+//   const head: Knot = KnotFactory();
+
+//   const one: Knot = KnotFactory();
+//   const two: Knot = KnotFactory();
+//   const three: Knot = KnotFactory();
+//   const four: Knot = KnotFactory();
+//   const five: Knot = KnotFactory();
+//   const six: Knot = KnotFactory();
+//   const seven: Knot = KnotFactory();
+//   const eight: Knot = KnotFactory();
+//   const tail: Knot = KnotFactory(true);
+
+//   const tails: Knot[] = [one, two, three, four, five, six, seven, eight, tail];
+
+//   for (let cmd of input) {
+//     let count = cmd.steps;
+//     const dir = cmd.dir;
+
+//     while (count > 0) {
+//       const coordsUpdated = head.moveHead(dir, bridge);
+//       if (coordsUpdated) tails.forEach((knot) => knot.updateCoords(dir));
+
+//       let prevKnot = head;
+//       for (let i = 0; i < tails.length; i++) {
+//         tails[i].moveTail(prevKnot.coords, bridge);
+//         prevKnot = tails[i];
+//       }
+
+//       count--;
+//     }
+//   }
+
+//   let visited = 0;
+
+//   for (let i = 0; i < bridge.grid.length; i++) {
+//     for (let j = 0; j < bridge.grid[0].length; j++) {
+//       if (bridge.grid[i][j].visited) visited++;
+//     }
+//   }
+
+//   return visited;
+// }
 
 const result = findVisited(input);
 
