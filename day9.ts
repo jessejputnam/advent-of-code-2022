@@ -10,6 +10,7 @@ interface GridItem {
 
 interface Knot {
   coords: number[];
+  tail: boolean;
   updateCoords(dir: string): boolean;
   moveHead(dir: string, bridge: Bridge): boolean;
   moveTail(coords: number[], bridge: Bridge): void;
@@ -116,9 +117,10 @@ function BridgeFactory(): Bridge {
   };
 }
 
-function KnotFactory(): Knot {
+function KnotFactory(isTail: boolean = false): Knot {
   return {
     coords: [0, 0],
+    tail: isTail,
 
     updateCoords: function (dir): boolean {
       const [row, col]: number[] = this.coords;
@@ -177,7 +179,7 @@ function KnotFactory(): Knot {
         this.coords[1] = head_col > tail_col ? tail_col + 1 : tail_col - 1;
       }
 
-      bridge.markVisited(this.coords);
+      if (this.tail) bridge.markVisited(this.coords);
     }
   };
 }
@@ -189,25 +191,72 @@ function GridItem(visited: boolean = false): GridItem {
 }
 
 /* ############################################################## */
-/* ###################### MAIN FUNCS ########################## */
+/* ###################### MAIN FUNC ########################## */
 /* ############################################################## */
+
+// PART 1
+
+// function findVisited(input: Cmd[]) {
+//   const bridge: Bridge = BridgeFactory();
+//   const head: Knot = KnotFactory();
+//   const tail: Knot = KnotFactory();
+
+//   for (let cmd of input) {
+//     let count = cmd.steps;
+//     const dir = cmd.dir;
+
+//     while (count > 0) {
+//       const coordsUpdated = head.moveHead(dir, bridge);
+//       if (coordsUpdated) tail.updateCoords(dir);
+//       tail.moveTail(head.coords, bridge);
+//       count--;
+//     }
+//   }
+
+//   let visited = 0;
+
+//   for (let i = 0; i < bridge.grid.length; i++) {
+//     for (let j = 0; j < bridge.grid[0].length; j++) {
+//       if (bridge.grid[i][j].visited) visited++;
+//     }
+//   }
+
+//   return visited;
+// }
+
+// PART 2
 
 function findVisited(input: Cmd[]) {
   const bridge: Bridge = BridgeFactory();
-  const head: Knot = KnotFactory();
-  const tail: Knot = KnotFactory();
 
-  let check = 0;
+  const head: Knot = KnotFactory();
+
+  const one: Knot = KnotFactory();
+  const two: Knot = KnotFactory();
+  const three: Knot = KnotFactory();
+  const four: Knot = KnotFactory();
+  const five: Knot = KnotFactory();
+  const six: Knot = KnotFactory();
+  const seven: Knot = KnotFactory();
+  const eight: Knot = KnotFactory();
+  const tail: Knot = KnotFactory(true);
+
+  const tails: Knot[] = [one, two, three, four, five, six, seven, eight, tail];
 
   for (let cmd of input) {
-    check++;
     let count = cmd.steps;
     const dir = cmd.dir;
 
     while (count > 0) {
       const coordsUpdated = head.moveHead(dir, bridge);
-      if (coordsUpdated) tail.updateCoords(dir);
-      tail.moveTail(head.coords, bridge);
+      if (coordsUpdated) tails.forEach((knot) => knot.updateCoords(dir));
+
+      let prevKnot = head;
+      for (let i = 0; i < tails.length; i++) {
+        tails[i].moveTail(prevKnot.coords, bridge);
+        prevKnot = tails[i];
+      }
+
       count--;
     }
   }
