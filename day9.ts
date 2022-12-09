@@ -198,13 +198,11 @@ function getTails(num: number): Knot[] {
   return knots;
 }
 
-function findVisited(input: Cmd[]) {
+function findVisited(input: Cmd[], num_tails: number) {
   const bridge: Bridge = BridgeFactory();
 
   const head: Knot = KnotFactory();
-
-  const tails: Knot[] = getTails(1);
-  // const tails: Knot[] = getTails(9);
+  const tails: Knot[] = getTails(num_tails);
 
   for (let cmd of input) {
     let count = cmd.steps;
@@ -219,7 +217,6 @@ function findVisited(input: Cmd[]) {
         tails[i].moveTail(prevKnot.coords, bridge);
         prevKnot = tails[i];
       }
-
       count--;
     }
   }
@@ -235,6 +232,6 @@ function findVisited(input: Cmd[]) {
   return visited;
 }
 
-const result = findVisited(input);
+const result = findVisited(input, 9);
 
 console.log("RESULT ---------- :", result);
