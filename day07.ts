@@ -1,4 +1,4 @@
-import { input, test_data } from "./day7-data";
+import { input, test_data } from "./day07-data";
 
 interface File {
   size: number;

@@ -1,4 +1,4 @@
-import data from "./day3-data";
+import data from "./day03-data";
 
 // Get priority rating of item
 function getPriority(item: string): number {

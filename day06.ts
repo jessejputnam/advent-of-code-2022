@@ -1,4 +1,4 @@
-import input from "./day6-data";
+import input from "./day06-data";
 
 /* ############################### Algorithm ######################################## */
 

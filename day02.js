@@ -1,4 +1,4 @@
-// import data from "./day2-data.js";
+import data from "./day02-data.js";
 
 /**
  * OPPONENT

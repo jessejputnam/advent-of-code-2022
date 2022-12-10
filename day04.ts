@@ -1,4 +1,4 @@
-import data from "./day4-data";
+import data from "./day04-data";
 
 /* #################### Part 1 ###################### */
 

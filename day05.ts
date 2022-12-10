@@ -5,7 +5,7 @@
   Tool: crane
 */
 
-import { instructions, ship_init } from "./day5-data";
+import { instructions, ship_init } from "./day05-data";
 
 interface instruc {
   num_crates: number;

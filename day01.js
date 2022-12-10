@@ -1,6 +1,6 @@
 "use strict";
 
-const data = require("./day1-data");
+const data = require("./day01-data");
 
 function findElfWithMostCalories(elves) {
   let first = 0;

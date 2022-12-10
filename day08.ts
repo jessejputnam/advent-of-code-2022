@@ -1,4 +1,4 @@
-import input from "./day8-data";
+import input from "./day08-data";
 
 // PART 1
 
